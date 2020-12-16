@@ -55,4 +55,35 @@ while num_valid < len(req):
 
 print(res)
 
+def egcd_modinv(a, m):
+    r_0, r_1 = a, m
+    s_0, s_1 = 1, 0
+    while r_1 != 0:
+        q = r_0 // r_1
+        r_0, r_1 = r_1, r_0 - q * r_1
+        s_0, s_1 = s_1, s_0 - q * s_1
+    if s_0 < 0:
+        s_0 += m
+    return s_0
 
+# Let's actually solve by construction rather than by sieving
+req = []
+N = 1
+for i, num in enumerate(bus_ids):
+    if num == 'x': continue
+    num = int(num)
+    N *= num
+    req.append((-i, num))
+
+res = 0
+for a, n in req:
+    N_i = N // n
+
+    # Use Euler's Theorem to find the inverse
+    M_i = pow(N_i, n - 2, n)
+    # Check with finding inverse using Extended Euclid
+    assert M_i == egcd_modinv(N_i, n)
+
+    res += a * M_i * N_i
+res %= N
+print(res)
